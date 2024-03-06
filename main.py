@@ -1,0 +1,38 @@
+import pandas as pd
+
+data = pd.read_csv("hypothyroid.csv")
+
+print("---Основная информация о данных---")
+print()
+print("Количество наблюдений: {}".format(data.shape[0]))
+print("Количество перемнных: {}".format(data.shape[1]))
+print()
+print("Типы данных:")
+print(data.dtypes)
+print()
+print("Количество пропущенных значений:")
+print(data.isnull().sum())
+
+# Удаляем строки с пропущенными значениями
+new_data = data.dropna()
+
+print()
+print("---Основные статистические характеристики данных---")
+print()
+print("Средние значения:")
+print(new_data.mean(numeric_only=True))
+print()
+print("Дисперсии:")
+print(new_data.var(numeric_only=True))
+print()
+print("Корреляции:")
+print(new_data.corr(numeric_only=True))
+print()
+print("Минимумы:")
+print(new_data.min(numeric_only=True))
+print()
+print("Максимумы:")
+print(new_data.max(numeric_only=True))
+print()
+print("Квартили:")
+print(new_data.quantile([0.25, 0.5, 0.75], numeric_only=True))
