@@ -1,6 +1,7 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+from scipy import stats
 
 
 # Вычисляем выбросы с помощью межквартильного размаха
@@ -66,6 +67,7 @@ print(data.max(numeric_only=True))
 print()
 print("Квартили:")
 print(data.quantile([0.25, 0.5, 0.75], numeric_only=True))
+print()
 
 # Гистрограммы с графиком функции распределения
 for column in columns:
@@ -82,3 +84,21 @@ for i in range(len(columns)):
     for j in range(i + 1, len(columns)):
         sns.scatterplot(data=data, x=columns[i], y=columns[j])
         plt.show()
+
+# Разделение данных на две группы
+hyper_data = data[data['queryhyperthyroid'] == 't']
+nohyper_data = data[data['queryhyperthyroid'] == 'f']
+
+# Проведение t-теста
+t_test, p_value = stats.ttest_ind(hyper_data['TSH'], nohyper_data['TSH'], equal_var=False)
+
+# Вывод результатов
+print("t-тест:", t_test)
+print("p-value:", p_value)
+
+# Оценка значимости различий
+alpha = 0.05
+if p_value < alpha:
+    print("Различия статистически значимы")
+else:
+    print("Нет статистически значимых различий")
