@@ -24,6 +24,9 @@ def outliers(column, dataset):
 
 
 data = pd.read_csv("hypothyroid.csv")
+data_columns = data.columns.difference(["Age", "sex", "TSH", "T3", "T4", "T4U", "FTI", "TBG", "referral source",
+                                        "binaryClass"])
+data[data_columns] = data[data_columns].map(lambda x: False if (x == 'f') else True)
 
 # Столбцы
 columns = ["Age", "TSH", "T3", "T4", "T4U", "FTI"]
@@ -51,22 +54,22 @@ for column in columns:
 print("---Основные статистические характеристики данных---")
 print()
 print("Средние значения:")
-print(data.mean(numeric_only=True))
+print(data.loc[:, columns].mean(numeric_only=True))
 print()
 print("Дисперсии:")
-print(data.var(numeric_only=True))
+print(data.loc[:, columns].var(numeric_only=True))
 print()
 print("Корреляции:")
-print(data.corr(numeric_only=True))
+print(data.loc[:, columns].corr(numeric_only=True))
 print()
 print("Минимумы:")
-print(data.min(numeric_only=True))
+print(data.loc[:, columns].min(numeric_only=True))
 print()
 print("Максимумы:")
-print(data.max(numeric_only=True))
+print(data.loc[:, columns].max(numeric_only=True))
 print()
 print("Квартили:")
-print(data.quantile([0.25, 0.5, 0.75], numeric_only=True))
+print(data.loc[:, columns].quantile([0.25, 0.5, 0.75], numeric_only=True))
 print()
 
 # Гистрограммы с графиком функции распределения
@@ -86,8 +89,8 @@ for i in range(len(columns)):
         plt.show()
 
 # Разделение данных на две группы
-hyper_data = data[data['queryhyperthyroid'] == 't']
-nohyper_data = data[data['queryhyperthyroid'] == 'f']
+hyper_data = data[data['queryhyperthyroid'] is True]
+nohyper_data = data[data['queryhyperthyroid'] is False]
 
 # Проведение t-теста
 t_test, p_value = stats.ttest_ind(hyper_data['TSH'], nohyper_data['TSH'], equal_var=False)
