@@ -2,6 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 from scipy import stats
+from sklearn.linear_model import LinearRegression
 
 
 # Вычисляем выбросы с помощью межквартильного размаха
@@ -88,16 +89,14 @@ for i in range(len(columns)):
         sns.scatterplot(data=data, x=columns[i], y=columns[j])
         plt.show()
 
-# Разделение данных на две группы
-hyper_data = data[data['queryhyperthyroid'] is True]
-nohyper_data = data[data['queryhyperthyroid'] is False]
+hyper_data = data[data['queryhyperthyroid'] == True]
+nohyper_data = data[data['queryhyperthyroid'] == False]
 
 # Проведение t-теста
 t_test, p_value = stats.ttest_ind(hyper_data['TSH'], nohyper_data['TSH'], equal_var=False)
 
-# Вывод результатов
-print("t-тест:", t_test)
-print("p-value:", p_value)
+print("t-тест: {}".format(t_test))
+print("p-value: {}".format(p_value))
 
 # Оценка значимости различий
 alpha = 0.05
@@ -105,3 +104,23 @@ if p_value < alpha:
     print("Различия статистически значимы")
 else:
     print("Нет статистически значимых различий")
+print()
+
+# Линейная регрессия
+X = data['FTI'].values.reshape(-1, 1)
+Y = data['T4'].values.reshape(-1, 1)
+
+model = LinearRegression()
+model.fit(X, Y)
+coef = model.coef_
+intercept = model.intercept_
+
+print("Коэффициент наклона: {}".format(coef[0]))
+print("Константа {}:".format(intercept))
+
+plt.scatter(X, Y, color='blue')
+plt.plot(X, model.predict(X), color='red', linewidth=3)
+plt.xlabel('FTI')
+plt.ylabel('T4')
+plt.title('Линейная регрессия между FTI и T4')
+plt.show()
