@@ -2,6 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 from scipy import stats
+import numpy as np
 from sklearn.linear_model import LinearRegression
 
 
@@ -106,6 +107,34 @@ else:
     print("Нет статистически значимых различий")
 print()
 
+mean = np.mean(data['TSH'])
+std = np.std(data['TSH'])
+
+# Вычисляем ожидаемые частоты для нормального распределения
+bins = sorted(set(data['TSH']))
+expected_freq = [len(data['TSH']) * stats.norm.cdf(bin, loc=mean, scale=std) for bin in bins]
+
+# Рассчитываем наблюдаемые частоты
+observed_freq, _ = np.histogram(data['TSH'], bins=len(expected_freq))
+
+observed_freq_arr = np.array(observed_freq)
+expected_freq_arr = np.array(expected_freq)
+expected_freq_arr = np.sum(observed_freq_arr) / np.sum(expected_freq) * expected_freq_arr
+
+# Выполняем критерий Пирсона
+chi2_stat, p_val = stats.chisquare(observed_freq_arr, f_exp=expected_freq_arr)
+
+print("Хи-квадрат статистика:", chi2_stat)
+print("p-value:", p_val)
+
+# Проверяем статистическую значимость
+alpha = 0.05
+if p_val < alpha:
+    print("Отвергаем нулевую гипотезу: данные не подчиняются нормальному распределению")
+else:
+    print("Нет оснований отвергать нулевую гипотезу: данные подчиняются нормальному распределению")
+print()
+
 # Линейная регрессия
 X = data['FTI'].values.reshape(-1, 1)
 Y = data['T4'].values.reshape(-1, 1)
@@ -115,6 +144,7 @@ model.fit(X, Y)
 coef = model.coef_
 intercept = model.intercept_
 
+print("Линейная регрессия между FTI и T4")
 print("Коэффициент наклона: {}".format(coef[0]))
 print("Константа {}:".format(intercept))
 
