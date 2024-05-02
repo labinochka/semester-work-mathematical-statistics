@@ -16,8 +16,8 @@ def outliers(column, dataset):
     lower_bound = Q1 - 1.5 * IQR
     upper_bound = Q3 + 1.5 * IQR
 
-    outliers = dataset[(dataset[column] < lower_bound) | (dataset[column] > upper_bound)]
-    dataset = dataset[(dataset[column] > lower_bound) & (dataset[column] < upper_bound)]
+    outliers = dataset[(dataset[column] < lower_bound) | (dataset[column] > upper_bound) | (dataset[column] == 0)]
+    dataset = dataset[(dataset[column] > lower_bound) & (dataset[column] < upper_bound) & dataset[column] > 0]
 
     print("Количество выбросов в столбце '{}':".format(column))
     print(outliers[column].count())
