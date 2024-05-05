@@ -93,10 +93,9 @@ for i in range(len(columns)):
 hyper_data = data[data['queryhyperthyroid'] == True]
 nohyper_data = data[data['queryhyperthyroid'] == False]
 
-# Проведение t-теста
-t_test, p_value = stats.ttest_ind(hyper_data['TSH'], nohyper_data['TSH'], equal_var=False)
+# Проведение теста Манна-Уитни
+statistic, p_value = stats.mannwhitneyu(hyper_data['TSH'], nohyper_data['TSH'])
 
-print("t-тест: {}".format(t_test))
 print("p-value: {}".format(p_value))
 
 # Оценка значимости различий
@@ -105,7 +104,6 @@ if p_value < alpha:
     print("Различия статистически значимы")
 else:
     print("Нет статистически значимых различий")
-print()
 
 mean = np.mean(data['TSH'])
 std = np.std(data['TSH'])
